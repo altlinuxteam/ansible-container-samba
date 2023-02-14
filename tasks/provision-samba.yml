@@ -1,0 +1,33 @@
+---
+#- name: Start Samba DC docker container
+- docker_container:
+    name: samba-dc-core
+    image: registry.altlinux.org/alt_kaa/{{ "samba-dc" if not samba_dc_mitkrb5 | bool else "samba-dc-mitkrb5" }}:latest
+    state: started
+    restart_policy: always
+    capabilities:
+      - sys_admin
+    network_mode: host
+    hostname: "{{ inventory_hostname_short }}.{{ samba_realm }}"
+    env_file: /etc/container-samba-dc.env
+    volumes:
+      - /etc/samba:/etc/samba
+      - /var/lib/samba:/var/lib/samba
+      - /var/cache/samba:/var/cache/samba
+      - /etc/resolv-container-samba-dc.conf:/etc/resolv.conf
+    exposed_ports:
+      - 88
+      - 88/udp
+      - 135
+      - 137-138/udp
+      - 139
+      - 389
+      - 389/udp
+      - 445
+      - 464
+      - 464/udp
+      - 636
+      - 3268-3269
+      - 49152-65535
+      - "{{ '53' if samba_dns_backend == 'SAMBA_INTERNAL' else '' }}"
+      - "{{ '53/udp' if samba_dns_backend == 'SAMBA_INTERNAL' else '' }}" 

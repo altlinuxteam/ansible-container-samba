@@ -1,0 +1,34 @@
+---
+#- name: Start Bind DNS docker container
+- name: Disable Bind DNS chroot
+  command:
+    cmd: control bind-chroot disabled
+
+- name: Remove rndc.conf include from Bind DNS named.conf file
+  lineinfile:
+    path: /etc/bind/named.conf
+    regexp: '^[\s,\t]*include "/etc/bind/rndc.conf";'
+    line: '#include "/etc/bind/rndc.conf";'
+    state: present
+
+- docker_container:
+    name: samba-dc-bind
+    image: registry.altlinux.org/alt_kaa/{{ "samba-dc" if not samba_dc_mitkrb5 | bool else "samba-dc-mitkrb5" }}:latest
+    state: started
+    restart_policy: always
+    capabilities:
+      - sys_admin
+    network_mode: host
+    env:
+      CONTAINER_TYPE: "bind_dns"
+    volumes:
+      - /etc/bind:/etc/bind
+      - /etc/sysconfig/network:/etc/sysconfig/network
+      - /etc/sysconfig/bind:/etc/sysconfig/bind
+      - /etc/samba:/etc/samba
+      - /var/lib/samba:/var/lib/samba
+      - /var/cache/samba:/var/cache/samba
+      - /etc/resolv-container-samba-dc.conf:/etc/resolv.conf
+    exposed_ports:
+      - 53
+      - 53/udp

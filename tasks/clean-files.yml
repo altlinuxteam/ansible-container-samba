@@ -1,0 +1,12 @@
+---
+- name: Clean directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/samba
+    - /var/lib/samba
+    - /var/lib/samba/sysvol
+    - /var/cache/samba
+#    - /etc/bind
+#    - /etc/sysconfig/bind

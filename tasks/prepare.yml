@@ -1,0 +1,26 @@
+---
+- name: Make directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/samba
+    - /var/lib/samba
+    - /var/lib/samba/sysvol
+    - /var/cache/samba
+#    - /etc/bind
+
+#- name: Make files
+#  file:
+#    path: /etc/sysconfig/bind
+#    state: touch
+
+- name: Generate independent resolv.conf file
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv-container-samba-dc.conf
+
+- name: Generate Samba DC container env file
+  template:
+    src: container-samba-dc.env.j2
+    dest: /etc/container-samba-dc.env

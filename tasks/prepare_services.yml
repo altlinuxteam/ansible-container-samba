@@ -1,0 +1,17 @@
+---
+- name: Disable and stop native Samba DC service
+  service:
+    name: samba
+    state: stopped
+    enabled: false
+
+- name: Disable and stop native Bind service
+  service:
+    name: bind
+    state: stopped
+    enabled: false
+
+- name: Enable Docker service
+  service:
+    name: docker
+    enabled: true

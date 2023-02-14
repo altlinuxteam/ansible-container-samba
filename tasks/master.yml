@@ -1,0 +1,38 @@
+---
+- name: Check required variables
+  fail: msg="{{ item }} is not defined"
+  when: item not in vars
+  with_items: "{{ samba_dc_master_required_vars }}"
+
+- name: Preparing services
+  include_tasks: prepare_services.yml
+
+- block:
+  - name: Cleaning containers
+    include_tasks: clean-containers.yml
+  - name: Cleaning files and directories
+    include_tasks: clean-files.yml
+  when: not samba_deploy_soft | bool
+
+- name: Preparing files and folders
+  include_tasks: prepare.yml
+
+- name: Start Docker service
+  service:
+    name: docker
+    state: started
+
+- block:
+  - name: Start Samba DC docker container
+    include_tasks: provision-samba.yml
+  - name: Start Bind DNS docker container
+    include_tasks: provision-bind.yml
+    when: samba_dns_backend == "BIND9_DLZ"
+  when: not samba_deploy_soft | bool
+
+- name: Register node in localhost hostvars
+  set_fact:
+    samba_masters: "{{ hostvars['localhost']['samba_masters'] | default([]) }} + [ '{{ inventory_hostname_short }}' ]"
+  delegate_to: localhost
+  delegate_facts: true
+                     

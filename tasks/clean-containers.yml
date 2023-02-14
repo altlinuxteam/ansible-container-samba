@@ -1,0 +1,44 @@
+---
+- name: Start Docker service
+  service:
+    name: docker
+    state: started
+
+- name: Get Samba DC container state
+  docker_container_info:
+    name: samba-dc-core
+  register: core_state
+
+- name: Get Bind DNS container state
+  docker_container_info:
+    name: samba-dc-bind
+  register: bind_state
+
+- block:
+  - name: Stop Samba DC docker container
+    docker_container:
+      name: samba-dc-core
+      state: stopped
+
+  - name: Remove Samba DC docker container
+    docker_container:
+      name: samba-dc-core
+      state: absent
+  when: not samba_deploy_soft | bool and core_state.exists
+
+- block:
+  - name: Stop Bind DNS docker container
+    docker_container:
+      name: samba-dc-bind
+      state: stopped
+
+  - name: Remove Bind DNS docker container
+    docker_container:
+      name: samba-dc-bind
+      state: absent
+  when: not samba_deploy_soft | bool and bind_state.exists
+
+- name: Stop Docker service
+  service:
+    name: docker
+    state: stopped

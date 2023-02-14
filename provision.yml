@@ -1,0 +1,12 @@
+---
+- name: Deploy master Samba DC container
+  hosts: master
+  become: false
+  roles:
+  - role: container-samba
+
+- name: Deploy replica Samba DC container
+  hosts: replicas
+  become: false
+  roles:
+  - role: container-samba

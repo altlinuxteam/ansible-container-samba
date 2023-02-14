@@ -1,0 +1,45 @@
+---
+- name: Check required variables
+  fail: msg="{{ item }} is not defined"
+  when: item not in vars
+  with_items: "{{ samba_dc_required_vars }}"
+
+- block:
+  - name: Install common software
+    apt_rpm:
+      pkg: "{{ samba_dc_common_packages }}"
+      state: present
+    when: samba_dc_common_packages | length > 0
+    notify: restart docker
+
+  - name: Set hostname
+    ansible.builtin.hostname:
+      name: "{{ inventory_hostname_short }}.{{ samba_realm }}"
+      use: systemd
+    notify: restart docker
+
+  - name: Restart needed services
+    meta: flush_handlers
+
+  - include: common.yml
+  when: samba_flavor != 'gen_test_env'
+
+- name: Deploy master Smaba DC container
+  include_tasks: master.yml
+  when: samba_flavor == 'master'
+
+- name: Deploy replica Smaba DC container
+  include_tasks: replica.yml
+  when: samba_flavor == 'replica'
+
+- name: Refresh kerberos key
+  shell: echo {{samba_admin_pass}} | kinit administrator@{{samba_realm|upper}}
+  changed_when: false
+  register: task_result
+  until: task_result.rc == 0
+  retries: 30
+  delay: 1
+
+- name: Generate test env vars
+  include_tasks: generate_test_env_vars.yml
+  when: samba_flavor == 'gen_test_env'
