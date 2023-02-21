@@ -8,12 +8,12 @@
     - /var/lib/samba
     - /var/lib/samba/sysvol
     - /var/cache/samba
-#    - /etc/bind
+    - /etc/bind
 
-#- name: Make files
-#  file:
-#    path: /etc/sysconfig/bind
-#    state: touch
+- name: Make files
+  file:
+    path: /etc/sysconfig/bind
+    state: touch
 
 - name: Generate independent resolv.conf file
   template:

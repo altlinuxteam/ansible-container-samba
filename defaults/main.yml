@@ -33,8 +33,6 @@ samba_dc_master_required_vars:
 samba_dc_replica_required_vars: []
 
 samba_dc_common_packages:
-  - bind
-  - bind-utils
   - krb5-kinit
   - sshpass
   - docker-engine
