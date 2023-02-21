@@ -1,15 +1,20 @@
 ---
+- name: Populate service facts
+  service_facts:
+
 - name: Disable and stop native Samba DC service
   service:
     name: samba
     state: stopped
     enabled: false
+  when: '"samba" in services'
 
 - name: Disable and stop native Bind service
   service:
     name: bind
     state: stopped
     enabled: false
+  when: '"bind" in services'
 
 - name: Enable Docker service
   service:
