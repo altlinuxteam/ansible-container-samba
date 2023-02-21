@@ -38,6 +38,10 @@ samba_dc_common_packages:
   - docker-engine
   - python3-module-docker
 
+samba_dc_bind_packages:
+  - bind
+  - bind-utils
+
 samba_dc_master_packages: []
 
 samba_dc_replica_packages: []

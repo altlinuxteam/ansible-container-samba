@@ -12,6 +12,13 @@
     when: samba_dc_common_packages | length > 0
     notify: restart docker
 
+  - name: Remove Bind DNS software
+    apt_rpm:
+      pkg: "{{ samba_dc_bind_packages }}"
+      state: absent
+    when: samba_dc_bind_packages | length > 0
+    notify: restart docker
+
   - name: Set hostname
     ansible.builtin.hostname:
       name: "{{ inventory_hostname_short }}.{{ samba_realm }}"
