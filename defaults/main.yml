@@ -14,6 +14,9 @@ samba_sites:
   main_site:
     subnet: # 10.64.175.0/24
 samba_deploy_soft: False
+samba_container_image:
+  samba-dc: registry.altlinux.org/alt_kaa/samba-dc:latest
+  samba-dc-mitkrb5: registry.altlinux.org/alt_kaa/samba-dc-mitkrb5:latest
 
 samba_required_vars:
   - samba_flavor

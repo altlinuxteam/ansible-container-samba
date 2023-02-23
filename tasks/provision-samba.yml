@@ -2,7 +2,7 @@
 #- name: Start Samba DC docker container
 - docker_container:
     name: samba-dc-core
-    image: registry.altlinux.org/alt_kaa/{{ "samba-dc" if not samba_dc_mitkrb5 | bool else "samba-dc-mitkrb5" }}:latest
+    image: "{{ samba_container_image['samba-dc' if not samba_dc_mitkrb5 | bool else 'samba-dc-mitkrb5'] }}"
     state: started
     restart_policy: always
     capabilities:
